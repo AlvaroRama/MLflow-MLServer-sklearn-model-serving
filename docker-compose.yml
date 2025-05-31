@@ -1,0 +1,70 @@
+services:
+
+  trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dockerice_mlflow_example:latest
+    volumes:
+    - ./mlruns:/mlruns
+    - ./logs:/app/logs
+    - ./models:/app/models
+    command: python train.py
+
+  mlflow-ui:
+    image: dockerice_mlflow_example:latest
+    build: .
+    volumes:
+      - ./mlruns:/mlruns
+      - ./logs:/app/logs
+      - ./models:/app/models
+    ports:
+      - "5000:5000"
+    command: mlflow ui --backend-store-uri /mlruns --host 0.0.0.0 --port 5000
+
+  mlflow-server: # Nuevo servicio para inferencia con MLflow Server
+    image: dockerice_mlflow_example:latest # Reutilizamos la misma imagen base
+    build: . # Aseguramos que se construya con los requisitos necesarios
+    #depends_on:
+    #  - trainer # Importante: queremos que el trainer haya generado el modelo
+    ports:
+      - "1234:1234" # Puerto para el servidor de MLflow
+    volumes:
+      - ./mlruns:/mlruns
+      - ./models:/app/models
+    environment:
+      - MLFLOW_TRACKING_URI=file:///mlruns # Apunta al mismo almacenamiento de MLflow
+      # Opcional: Define la ruta base para los modelos si no usas el registro de modelos.
+      # - MLFLOW_MODELS_PATH=/models 
+    command: >
+      bash -c "/usr/local/bin/dockerize -wait file:///app/models/sklearn-model/model.joblib -timeout 300s && mlflow models serve --model-uri models:/GradientBoostingModel/latest --host 0.0.0.0 --port 1234 --no-conda"
+
+
+  model-server:
+    image: dockerice_mlflow_example:latest
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./mlruns:/mlruns
+      - ./logs:/app/logs
+      - ./models/:/app/models # Asegúrate de que esta línea esté
+    environment:
+      - MLSERVER_MODELS_DIR=/models
+    command: >
+      bash -c "
+      /usr/local/bin/dockerize -wait file:///app/models/sklearn-model/model.joblib -timeout 300s && \
+      exec mlserver start /app/models/sklearn-model
+      "
+
+
+# Alternativa de mlflow-ui usando Bitnami:
+# image: bitnami/mlflow:latest
+# ports:
+#   - "5000:5000"
+# volumes:
+#   - ./mlruns:/mlruns # Este volumen es para persistir TUS datos de MLflow
+# environment:
+#   # Ambos deben apuntar al mismo lugar dentro del contenedor: el volumen persistente
+#   - MLFLOW_TRACKING_URI=file:///mlruns
+# command: mlflow ui --backend-store-uri file:///mlruns --host 0.0.0.0 --port 5000
