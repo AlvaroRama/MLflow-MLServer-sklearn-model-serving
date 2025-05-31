@@ -1,0 +1,30 @@
+{
+    "name": "sklearn-model",
+    "implementation": "models.sklearn-model.custom_sklearn_runtime.CustomSKLearnModel",
+    "parameters": {
+        "version": "v1.0.0"
+    },
+    "inputs": [
+        {
+            "name": "input_data",
+            "datatype": "FP64",
+            "shape": [
+                -1,
+                8
+            ],
+            "parameters": {
+                "columns": [
+                    "MedInc",
+                    "HouseAge",
+                    "AveRooms",
+                    "AveBedrms",
+                    "Population",
+                    "AveOccup",
+                    "Latitude",
+                    "Longitude"
+                ],
+                "use_dataframe": true
+            }
+        }
+    ]
+}

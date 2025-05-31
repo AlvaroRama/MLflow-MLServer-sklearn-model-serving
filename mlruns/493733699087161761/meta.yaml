@@ -1,0 +1,6 @@
+artifact_location: file:///mlruns/493733699087161761
+creation_time: 1748664498153
+experiment_id: '493733699087161761'
+last_update_time: 1748664498153
+lifecycle_stage: active
+name: california_housing_experiment

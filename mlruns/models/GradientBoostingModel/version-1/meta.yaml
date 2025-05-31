@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1748664614533
+current_stage: None
+description: null
+last_updated_timestamp: 1748664614533
+name: GradientBoostingModel
+run_id: 541d22cc4d0a48fdb10baaafe0ec84a2
+run_link: null
+source: runs:/541d22cc4d0a48fdb10baaafe0ec84a2/gbr_model
+status: READY
+status_message: null
+storage_location: runs:/541d22cc4d0a48fdb10baaafe0ec84a2/gbr_model
+user_id: null
+version: 1
